@@ -32,7 +32,7 @@ int main (){
         cout << "Não foi possível abrir o arquivo";
     }
 
-    buscaGulosa();
+    buscaGulosa(firstLine, secondLine, thirdLine);
 
     // verificando valores
     cout << "Primeira linha: " << firstLine << endl;
@@ -44,8 +44,9 @@ int main (){
     cout << endl;
 }
 
-void buscaGulosa(){
+void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     // criar um vetor com valores 20 (no caso desse .txt) e ir subtraindo pelos valores da terceira linha, caso tenha
     // opção de troca de item por recipiente, terá que ser feito de um jeito diferente para permitir a troca dos itens
+    
     return;
 }

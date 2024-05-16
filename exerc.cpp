@@ -47,6 +47,9 @@ int main (){
 void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     // criar um vetor com valores 20 (no caso desse .txt) e ir subtraindo pelos valores da terceira linha, caso tenha
     // opção de troca de item por recipiente, terá que ser feito de um jeito diferente para permitir a troca dos itens
-    
+    vector<int> recipientes(numItens, capacidade); // vetor[numItens] onde cada item é igual a capacidade
+    if (numItens != 0){
+
+    }
     return;
 }

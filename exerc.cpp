@@ -3,8 +3,42 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
+
+void buscaGulosa(int capacidade, int numItens, vector<int> itens){
+    vector<int> recipientes(1, capacidade); // vetor[numItens] onde cada item é igual a capacidade
+    srand(time(0));
+    int recipienteAtual = 0;
+
+    while (numItens != 0){
+        if (!itens.empty()) {
+            int index = rand() % itens.size(); // sorteia um valor
+            int itemSorteado = itens[index];
+            itens.erase(itens.begin() + index); // remove o valor sorteado
+            numItens--;
+            if (itemSorteado <= recipientes[recipienteAtual]) {
+                recipientes[recipienteAtual] -= itemSorteado;
+                //cout << "Item sorteado: " << itemSorteado << " | Recipiente " << recipienteAtual+1 << " valor: " << recipientes[recipienteAtual] << endl;
+            } else {
+                recipientes.push_back(capacidade);
+                recipienteAtual++;
+                recipientes[recipienteAtual] -= itemSorteado;
+                //cout << "Item sorteado: " << itemSorteado << " | Recipiente " << recipienteAtual+1 << " valor: " << recipientes[recipienteAtual] << endl;
+            }
+        }
+    }
+
+    cout << "Recipientes: ";
+    for (int i = 0; i < recipientes.size(); i++) {
+        cout << recipientes[i] << " ";
+    }
+    cout << endl;
+
+    return;
+}
 
 int main (){
     ifstream file("./entradasParaTeste/PEU1.txt"); // abrindo o .txt
@@ -42,14 +76,4 @@ int main (){
         cout << thirdLine[i] << " ";
     }
     cout << endl;
-}
-
-void buscaGulosa(int capacidade, int numItens, vector<int> itens){
-    // criar um vetor com valores 20 (no caso desse .txt) e ir subtraindo pelos valores da terceira linha, caso tenha
-    // opção de troca de item por recipiente, terá que ser feito de um jeito diferente para permitir a troca dos itens
-    vector<int> recipientes(numItens, capacidade); // vetor[numItens] onde cada item é igual a capacidade
-    if (numItens != 0){
-
-    }
-    return;
 }

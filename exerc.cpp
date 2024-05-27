@@ -8,7 +8,10 @@
 
 using namespace std;
 
-vector<int> trocarVizinhanca(vector<int> solucaoInicial, vector<pair<int, int>> itemRecipiente, vector<int> itens, int capacidadeRecipiente, int* custo, int* recipientes){
+
+vector<pair<int, int>> itemRecipiente; // pair<item, recipiente>
+
+vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipiente, int* custo, int* recipientes){
     bool gerar = true;
     int index1 = rand() % itemRecipiente.size(); // 5
     int index2 = rand() % itemRecipiente.size();
@@ -26,16 +29,23 @@ vector<int> trocarVizinhanca(vector<int> solucaoInicial, vector<pair<int, int>> 
         capacidadeRec2 = solucaoInicial[rec2];
 
         if(rec1 != rec2 && (capacidadeRec1 - itemRecipiente[index2].first) >= 0){
+            cout<<"capacidade do primeiro para a troca: "<< capacidadeRec1 - itemRecipiente[index2].first << endl;
             gerar = false;
         }
     }
 
-    cout << "Recipiente " << rec1 << " vai ser diminuido " << itemRecipiente[index2].first << endl;
-    cout << "Recipiente " << rec2 << " vai ser somado " << itemRecipiente[index2].first << endl;
+    cout << "Recipiente " << rec1 << " vai receber o item " << itemRecipiente[index2].first << endl;
+    cout << "Recipiente " << rec2 << " vai perder o item " << itemRecipiente[index2].first << endl;
 
+    itemRecipiente[index2].second = rec1;
     solucaoInicial[rec1] -= itemRecipiente[index2].first;
     solucaoInicial[rec2] += itemRecipiente[index2].first;
-    if(solucaoInicial[rec2] >= capacidadeRecipiente){
+    if(solucaoInicial[rec2] == capacidadeRecipiente){
+        for(int i = 0; i < itemRecipiente.size(); i++){
+            if(itemRecipiente[i].second > rec2){
+                itemRecipiente[i].second -= 1;
+            }
+        }
         solucaoInicial.erase(solucaoInicial.begin() + rec2);
     }
 
@@ -55,8 +65,6 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
 
     vector<int> solucaoInicial; // vetor[numItens] onde cada item é igual a capacidade
     int recipienteAtual = 0;
-
-    vector<pair<int, int>> itemRecipiente; // pair<item, recipiente>
 
     while (numItens != 0){
         if (!itens.empty()) {
@@ -91,20 +99,28 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     int saMax = 3;
     int deltaE = 0;
     float recipientesTotais = 0;
-    float t0;
+    float t0 = 0;
     float alfa = 0.95;
 
-    for(int i = 0; i < saMax; i++){
-        // vector<int> solucaoInicialCopy = solucaoInicial;
-        // vector<pair<int, int>> itemRecipienteCopy = itemRecipiente;
-        int custoIndividual = 0;
-        int recipienteIndividual = 0;
-        solucaoInicial = trocarVizinhanca(solucaoInicial, itemRecipiente, itens, capacidade, &custoIndividual, &recipienteIndividual);
-        deltaE += custoIndividual;
-        recipientesTotais += recipienteIndividual;
-    }
-    t0 = recipientesTotais / saMax;
-    cout << "Temperatura inicial: " << t0 << endl;
+    do {
+        if(t0 != 0){
+            t0 *= alfa;
+        }
+        for(int i = 0; i < saMax; i++){
+            // vector<int> solucaoInicialCopy = solucaoInicial;
+            // vector<pair<int, int>> itemRecipienteCopy = itemRecipiente;
+            int custoIndividual = 0;
+            int recipienteIndividual = 0;
+            solucaoInicial = trocarVizinhanca(solucaoInicial, capacidade, &custoIndividual, &recipienteIndividual);
+
+            deltaE += custoIndividual;
+            recipientesTotais += recipienteIndividual;
+        }
+        if(t0 == 0){
+            t0 = recipientesTotais / saMax;
+        }
+        cout << "Temperatura final: " << t0 << endl;
+    } while(t0 > 0.005);
 
     return;
 }

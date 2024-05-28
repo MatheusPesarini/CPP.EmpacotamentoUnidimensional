@@ -9,10 +9,11 @@
 
 using namespace std;
 
-
 vector<pair<int, int>> itemRecipiente; // pair<item, recipiente>
-
 float temperatura = 0;
+
+vector<float> temperaturaPlot;
+vector<int> iteracoes;
 
 vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipiente, int* custo, int* recipientes){
     vector<int> solucaoFinal = solucaoInicial;
@@ -88,10 +89,10 @@ vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipient
 }
 
 void buscaGulosa(int capacidade, int numItens, vector<int> itens){
-    srand(time(NULL));
-
     vector<int> solucaoInicial; // vetor[numItens] onde cada item é igual a capacidade
     int recipienteAtual = 0;
+
+    int counter = 0;
 
     while (numItens != 0){
         if (!itens.empty()) {
@@ -131,6 +132,9 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     do {
         if(temperatura != 0){
             temperatura *= alfa;
+            temperaturaPlot.push_back(temperatura);
+            counter += 1;
+            iteracoes.push_back(counter);
         }
         for(int i = 0; i < saMax; i++){
             int custoIndividual = 0;
@@ -147,6 +151,17 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     } while(temperatura > 0.005);
 
     return;
+}
+
+void chamarPlotagem(){
+    string command = "python plot.py";
+    for(float temperatura : temperaturaPlot){
+        command += " temp_" + to_string(temperatura);
+    }
+    for(int iteracao : iteracoes){
+        command += " iter_" + to_string(iteracao);
+    }
+    system(command.c_str());
 }
 
 int main (){
@@ -177,6 +192,7 @@ int main (){
     }
 
     buscaGulosa(capacidadesolucaoInicial, numItens, tamanhoItens);
+    chamarPlotagem();
 
     // verificando valores
     

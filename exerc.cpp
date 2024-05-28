@@ -5,13 +5,25 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <math.h>
 
 using namespace std;
 
 
 vector<pair<int, int>> itemRecipiente; // pair<item, recipiente>
 
+float temperatura = 0;
+
 vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipiente, int* custo, int* recipientes){
+    vector<int> solucaoFinal = solucaoInicial;
+    int deltaEInicial = 0;
+    for(int i = 0; i < solucaoInicial.size(); i++){
+        if(solucaoInicial[i] != 15 && solucaoInicial[i] != 0){
+            deltaEInicial += 1;
+        }
+    }
+
+
     bool gerar = true;
     int index1 = rand() % itemRecipiente.size(); // 5
     int index2 = rand() % itemRecipiente.size();
@@ -33,31 +45,46 @@ vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipient
             gerar = false;
         }
     }
-
-    cout << "Recipiente " << rec1 << " vai receber o item " << itemRecipiente[index2].first << endl;
-    cout << "Recipiente " << rec2 << " vai perder o item " << itemRecipiente[index2].first << endl;
+    int deltaE = 0;
 
     itemRecipiente[index2].second = rec1;
-    solucaoInicial[rec1] -= itemRecipiente[index2].first;
-    solucaoInicial[rec2] += itemRecipiente[index2].first;
-    if(solucaoInicial[rec2] == capacidadeRecipiente){
-        for(int i = 0; i < itemRecipiente.size(); i++){
-            if(itemRecipiente[i].second > rec2){
-                itemRecipiente[i].second -= 1;
-            }
-        }
-        solucaoInicial.erase(solucaoInicial.begin() + rec2);
-    }
+    solucaoFinal[rec1] -= itemRecipiente[index2].first;
+    solucaoFinal[rec2] += itemRecipiente[index2].first;
 
     cout << "S: "; 
-    for(int i = 0; i < solucaoInicial.size(); i++){
-        cout << solucaoInicial[i] << " ";
+    for(int i = 0; i < solucaoFinal.size(); i++){
         (*recipientes) += 1;
-        *custo += solucaoInicial[i];
+        if(solucaoFinal[i] != 15 && solucaoFinal[i] != 0){
+            deltaE += 1;
+        }
+        *custo += solucaoFinal[i];
+        cout << solucaoFinal[i] << " ";
     }
     cout << endl;
 
-    return solucaoInicial;
+    cout << "DeltaE: " << deltaE - deltaEInicial << endl;
+    if((deltaE - deltaEInicial) > 0){
+        float divisao = (float)-(deltaE-deltaEInicial)/temperatura;
+        float pE = exp(divisao);
+        cout << "pE: " << pE << endl;
+
+        float p = (float)rand() / RAND_MAX;
+        cout << "p: " << p << endl;
+        if(pE > p){
+            cout << "Aceitou" << endl;
+            cout << "Recipiente " << rec1 << " vai receber o item " << itemRecipiente[index2].first << endl;
+            cout << "Recipiente " << rec2 << " vai perder o item " << itemRecipiente[index2].first << endl;
+            return solucaoFinal;
+        } else {
+            cout << "Rejeitou" << endl;
+            itemRecipiente[index2].second = rec2;
+            return solucaoInicial;
+        }
+    } else {
+        cout << "Recipiente " << rec1 << " vai receber o item " << itemRecipiente[index2].first << endl;
+        cout << "Recipiente " << rec2 << " vai perder o item " << itemRecipiente[index2].first << endl;
+        return solucaoFinal;
+    }
 }
 
 void buscaGulosa(int capacidade, int numItens, vector<int> itens){
@@ -99,12 +126,11 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     int saMax = 3;
     int deltaE = 0;
     float recipientesTotais = 0;
-    float t0 = 0;
     float alfa = 0.95;
 
     do {
-        if(t0 != 0){
-            t0 *= alfa;
+        if(temperatura != 0){
+            temperatura *= alfa;
         }
         for(int i = 0; i < saMax; i++){
             // vector<int> solucaoInicialCopy = solucaoInicial;
@@ -116,11 +142,11 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
             deltaE += custoIndividual;
             recipientesTotais += recipienteIndividual;
         }
-        if(t0 == 0){
-            t0 = recipientesTotais / saMax;
+        if(temperatura == 0){
+            temperatura = recipientesTotais / saMax;
         }
-        cout << "Temperatura final: " << t0 << endl;
-    } while(t0 > 0.005);
+        cout << "Temperatura final: " << temperatura << endl;
+    } while(temperatura > 0.005);
 
     return;
 }

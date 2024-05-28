@@ -133,8 +133,6 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
             temperatura *= alfa;
         }
         for(int i = 0; i < saMax; i++){
-            // vector<int> solucaoInicialCopy = solucaoInicial;
-            // vector<pair<int, int>> itemRecipienteCopy = itemRecipiente;
             int custoIndividual = 0;
             int recipienteIndividual = 0;
             solucaoInicial = trocarVizinhanca(solucaoInicial, capacidade, &custoIndividual, &recipienteIndividual);

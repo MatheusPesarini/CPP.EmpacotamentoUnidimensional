@@ -11,9 +11,11 @@ using namespace std;
 
 vector<pair<int, int>> itemRecipiente; // pair<item, recipiente>
 float temperatura = 0;
+int minRecipientes = 0;
 
 vector<float> temperaturaPlot;
 vector<int> iteracoes;
+vector<int> recipientesPlot;
 
 vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipiente, int* custo, int* recipientes){
     vector<int> solucaoFinal = solucaoInicial;
@@ -98,6 +100,7 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
         if (!itens.empty()) {
             if(solucaoInicial.empty()) {
                 solucaoInicial.push_back(capacidade);
+                minRecipientes += 1;
             }
 
             int index = rand() % itens.size(); // sorteia um valor de 0 a 19
@@ -110,6 +113,7 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
                 //cout << "Item sorteado: " << itemSorteado << " | Recipiente " << recipienteAtual+1 << " valor: " << solucaoInicial[recipienteAtual] << endl;
             } else {
                 solucaoInicial.push_back(capacidade);
+                minRecipientes += 1;
                 recipienteAtual++;
                 itemRecipiente.push_back(make_pair(itemSorteado, recipienteAtual));
                 solucaoInicial[recipienteAtual] -= itemSorteado;
@@ -133,6 +137,8 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
         if(temperatura != 0){
             temperatura *= alfa;
             temperaturaPlot.push_back(temperatura);
+            recipientesPlot.push_back(minRecipientes);
+            
             counter += 1;
             iteracoes.push_back(counter);
         }
@@ -143,6 +149,15 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
 
             deltaE += custoIndividual;
             recipientesTotais += recipienteIndividual;
+        }
+        int localCounter = 0;
+        for(int i = 0; i < solucaoInicial.size(); i++){
+            if(solucaoInicial[i] != 15){
+                localCounter += 1;
+            }
+        }
+        if(localCounter < minRecipientes){
+            minRecipientes = localCounter;
         }
         if(temperatura == 0){
             temperatura = recipientesTotais / saMax;
@@ -160,6 +175,9 @@ void chamarPlotagem(){
     }
     for(int iteracao : iteracoes){
         command += " iter_" + to_string(iteracao);
+    }
+    for(int recipiente : recipientesPlot){
+        command += " rec_" + to_string(recipiente);
     }
     system(command.c_str());
 }

@@ -149,7 +149,7 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
             temperatura *= alfa;
             temperaturaPlot.push_back(temperatura);
             recipientesPlot.push_back(minRecipientes);
-            cout << "MElhor solucao da vizinhanca" << melhorSolucaoVizinhanca << endl;
+            cout << "Melhor solucao da vizinhanca" << melhorSolucaoVizinhanca << endl;
             melhoresSolucoesVizinhancas.push_back(melhorSolucaoVizinhanca);
 
             counter += 1;
@@ -161,6 +161,17 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
             int recipienteIndividual = 0;
             solucaoInicial = trocarVizinhanca(solucaoInicial, capacidade, &custoIndividual, &recipienteIndividual);
 
+            
+            for(int i = 0; i < solucaoInicial.size(); i++){
+                if(solucaoInicial[i] != 15){
+                    localCounter += 1;
+                }
+            }
+            if(localCounter < minRecipientes){
+                minRecipientes = localCounter;
+            }
+            localCounter = 0;
+
             if(custoIndividual < melhorSolucaoVizinhanca){
                 melhorSolucaoVizinhanca = custoIndividual;
             }
@@ -168,14 +179,6 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
         }
 
 
-        for(int i = 0; i < solucaoInicial.size(); i++){
-            if(solucaoInicial[i] != 15){
-                localCounter += 1;
-            }
-        }
-        if(localCounter < minRecipientes){
-            minRecipientes = localCounter;
-        }
         if(temperatura == 0){
             temperatura = recipientesTotais / saMax;
         }

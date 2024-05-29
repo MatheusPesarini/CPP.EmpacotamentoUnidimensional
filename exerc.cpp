@@ -16,6 +16,7 @@ int minRecipientes = 0;
 vector<float> temperaturaPlot;
 vector<int> iteracoes;
 vector<int> recipientesPlot;
+vector<int> melhoresSolucoesVizinhancas;
 
 vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipiente, int* custo, int* recipientes){
     vector<int> solucaoFinal = solucaoInicial;
@@ -30,15 +31,15 @@ vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipient
     bool gerar = true;
     int index1 = rand() % itemRecipiente.size(); // 5
     int index2 = rand() % itemRecipiente.size();
-    int rec1 = itemRecipiente[index1].second;
+    // int rec1 = itemRecipiente[index1].second;
+    int rec1 = rand() % solucaoInicial.size();
     int rec2 = itemRecipiente[index2].second;
     int capacidadeRec1 = solucaoInicial[rec1];
     int capacidadeRec2 = solucaoInicial[rec2];
     
     while(gerar){
-        index1 = rand() % itemRecipiente.size();
         index2 = rand() % itemRecipiente.size();
-        rec1 = itemRecipiente[index1].second;
+        rec1 = rand() % solucaoInicial.size();
         rec2 = itemRecipiente[index2].second;
         capacidadeRec1 = solucaoInicial[rec1];
         capacidadeRec2 = solucaoInicial[rec2];
@@ -60,7 +61,9 @@ vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipient
         if(solucaoFinal[i] != 15 && solucaoFinal[i] != 0){
             deltaE += 1;
         }
-        *custo += solucaoFinal[i];
+        if(solucaoFinal[i] != 15){
+            *custo += 1;
+        }
         cout << solucaoFinal[i] << " ";
     }
     cout << endl;
@@ -81,6 +84,12 @@ vector<int> trocarVizinhanca(vector<int> solucaoInicial, int capacidadeRecipient
         } else {
             cout << "Rejeitou" << endl;
             itemRecipiente[index2].second = rec2;
+            *custo = 0;
+            for(int i = 0; i < solucaoInicial.size(); i++){
+                if(solucaoInicial[i] != 15){
+                    *custo += 1;
+                }
+            }
             return solucaoInicial;
         }
     } else {
@@ -129,28 +138,36 @@ void buscaGulosa(int capacidade, int numItens, vector<int> itens){
     cout << endl;
 
     int saMax = 3;
-    int deltaE = 0;
     float recipientesTotais = 0;
     float alfa = 0.95;
 
+    int melhorSolucaoVizinhanca = (int)INFINITY;
+
     do {
+        int localCounter = 0;
         if(temperatura != 0){
             temperatura *= alfa;
             temperaturaPlot.push_back(temperatura);
             recipientesPlot.push_back(minRecipientes);
-            
+            cout << "MElhor solucao da vizinhanca" << melhorSolucaoVizinhanca << endl;
+            melhoresSolucoesVizinhancas.push_back(melhorSolucaoVizinhanca);
+
             counter += 1;
             iteracoes.push_back(counter);
+            melhorSolucaoVizinhanca = (int)INFINITY;
         }
         for(int i = 0; i < saMax; i++){
             int custoIndividual = 0;
             int recipienteIndividual = 0;
             solucaoInicial = trocarVizinhanca(solucaoInicial, capacidade, &custoIndividual, &recipienteIndividual);
 
-            deltaE += custoIndividual;
+            if(custoIndividual < melhorSolucaoVizinhanca){
+                melhorSolucaoVizinhanca = custoIndividual;
+            }
             recipientesTotais += recipienteIndividual;
         }
-        int localCounter = 0;
+
+
         for(int i = 0; i < solucaoInicial.size(); i++){
             if(solucaoInicial[i] != 15){
                 localCounter += 1;
@@ -178,6 +195,9 @@ void chamarPlotagem(){
     }
     for(int recipiente : recipientesPlot){
         command += " rec_" + to_string(recipiente);
+    }
+    for(int melhorSolucao : melhoresSolucoesVizinhancas){
+        command += " ms_" + to_string(melhorSolucao);
     }
     system(command.c_str());
 }
